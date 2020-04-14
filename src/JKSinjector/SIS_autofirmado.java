@@ -64,7 +64,7 @@ public class SIS_autofirmado {
             
             
             Certificado cert = new Certificado(pwd_keystore,rutaK); 
-            cert.borrarAlias(cert.getAlias());
+            cert.borrarAlias(cert.getNom1Alias());
             cert.setKeystore("lalala",cert.getCertAutofirmados("CN= EXPERIAN_Java,O=Experian,OU=Experian,L=CABA,ST=CABA,C=AR"));
             
             

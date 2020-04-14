@@ -27,7 +27,8 @@ public class JKSinjectorDAS {
      * @param args the command line arguments
      */
     public static void main(String[] args){
-       
+      String nomAliasJOB = "";
+      String nomAliasREPO = "";
       //---Manipulacion archivos config del DAS
       Archivo arch_confJOB = new Archivo("C:/test/DAS/Job Server v1.15/conf/com.eda.crypto.cfg");
       Archivo arch_confREPO = new Archivo("C:/test/DAS/Repository Server v1.15/conf/com.eda.crypto.cfg");
@@ -82,12 +83,18 @@ public class JKSinjectorDAS {
       /* Abrir keystore*/
       Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
       certJOB.mostrarAlias();
+      nomAliasJOB = certJOB.getNom1Alias();
+      System.out.println(nomAliasJOB);
+      
+      /*
       Certificado certREPO = new Certificado(pwd_keystoreREPO, ruta_keystoreREPO.toString());
-      certREPO.mostrarAlias();
+      nomAliasREPO = certREPO.getNom1Alias();
+      System.out.println(nomAliasJOB);
+      //certREPO.mostrarAlias();
       //TrustStore
       Certificado truststore = new Certificado(pwd_TrustStore, ruta_TrustStore.toString());
-      truststore.mostrarAlias();
-      
+     // truststore.mostrarAlias();
+     */
       
       
       /*

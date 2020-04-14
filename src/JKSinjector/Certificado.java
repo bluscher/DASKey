@@ -46,18 +46,14 @@ import sun.security.x509.X500Name;*/
  * @author e10934a
  */
 public final class Certificado {
-
-   // private static final String path = "c:/test";
-    private static final String KEYSTORE = "keystore.jks";
-    private static final String STOREPASS = "changeit";
-    private static final String KEYPASS = "changeit";
-    
+  
      //Medida de las claves
     public static final int KEY_LEN = 2048;
     //Fecha de expiración
     private static final int EXPIRATION = 365;
     //Algoritmo de firma a usar
     private static final String ALGORITHM = "SHA1withRSA";
+    private static final String OUTPUT_PATH = "C://test/output/certificado.crt";
     
     private static final Logger log = Logger.getLogger(Certificado.class.getName());
     
@@ -92,18 +88,19 @@ public final class Certificado {
         try {
             aliases = ks.aliases();
         } catch (KeyStoreException ex) {
-            log.error("Error Keystore",ex);
+            log.error("Error no hay Alias en el Keystore",ex);
         }
       while (aliases.hasMoreElements()){
-         System.out.println("- "+aliases.nextElement());
+         System.out.println(aliases.nextElement());
      }
-     System.out.println("Listar Alias: [END]");
+     System.out.println("#Listar Alias: [END]");
     } 
     
-    public String getAlias(){
+    public String getNom1Alias(){
         String result = "Ningun Alias";
         Enumeration aliases = null;
         try {
+          log.info("El numero de alias es : " + ks.size());
           aliases = ks.aliases();
         } catch (KeyStoreException ex) {
             log.error("No existe ningun Alias",ex);
@@ -113,6 +110,15 @@ public final class Certificado {
             }
             return result;
    
+    }
+    
+    public int cantAlias(){
+        try {
+            return this.ks.size();
+        } catch (KeyStoreException ex) {
+            log.error("Error con cargar el Keystore", ex);
+        }
+        return 0;
     }
     
     public void borrarAlias(String aliasToDell) throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException{
@@ -246,7 +252,7 @@ public final class Certificado {
         } catch (NoSuchAlgorithmException ex) {
             log.error("Error en algoritmo ", ex);
         }
-        keyGen.initialize(KEY_LEN);
+        keyGen.initialize(KEY_LEN);  
         KeyPair kPair = keyGen.generateKeyPair();
         log.info("llave publicar: " + kPair.getPublic().toString());
         log.info("llave privada: " + kPair.getPrivate().toString());
@@ -282,7 +288,7 @@ public final class Certificado {
             log.error("error gral. ", ex);
         }
 
-        try (FileOutputStream certFile = new FileOutputStream("C://test/certificadoTEST.crt")) {
+        try (FileOutputStream certFile = new FileOutputStream(OUTPUT_PATH)) {
             try {
                 certFile.write(cert.getEncoded());
                 log.info("nuevo certificado creado en path [ok]");

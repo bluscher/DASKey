@@ -43,21 +43,17 @@ public class SIS_autofirmado {
             
             //---Manipulacion archivo config del SIS
             Archivo arch_conf = new Archivo(PATHSYSTEMPROP);
-            try {
-                /*EJECUCION SOFT DEPLOYADO
-                Path rootApp = sistemaFicheros.getPath("./");
-                Path ruta_keystore = arch_conf.getPath(arch_conf.getParamExt(KEYSTOREPATH));
-                rutaK =rootApp.toString() + ruta_keystore.toString();
-                log.info("ruta JKS: "+rutaK);
-                */
-                
-                //test local
-                Path ruta_keystore = arch_conf.getPath(arch_conf.getParam(KEYSTOREPATH));
-                rutaK = ruta_keystore.toString();
-                log.info("ruta JKS: "+rutaK);
-            } catch (IOException ex) {
-                log.error("error IO", ex);
-            }
+            /*EJECUCION SOFT DEPLOYADO
+            Path rootApp = sistemaFicheros.getPath("./");
+            Path ruta_keystore = arch_conf.getPath(arch_conf.getParamExt(KEYSTOREPATH));
+            rutaK =rootApp.toString() + ruta_keystore.toString();
+            log.info("ruta JKS: "+rutaK);
+            */
+            
+            //test local
+            Path ruta_keystore = arch_conf.getPath(arch_conf.getParam(KEYSTOREPATH));
+            rutaK = ruta_keystore.toString();
+            log.info("ruta JKS: "+rutaK);
             String pwd_keystore = arch_conf.getParam(KEYSTOREPASS);
             //log.debug(rutaK);
             //log.debug(pwd_keystore);

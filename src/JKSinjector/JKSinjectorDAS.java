@@ -43,51 +43,27 @@ public class JKSinjectorDAS {
  
       
     Path ruta_keystoreJOB = null;
-        try {
-            ruta_keystoreJOB = arch_confJOB.getPath(arch_confJOB.getParam(KESTOREPATH));
-            log.info("Path Keystore JOB: " + ruta_keystoreJOB.toString());
-        } catch (IOException ex) {
-            log.error("Error IO",ex);
-        }
+    ruta_keystoreJOB = arch_confJOB.getPath(arch_confJOB.getParam(KESTOREPATH));
+    log.info("Path Keystore JOB: " + ruta_keystoreJOB.toString());
     String pwd_keystoreJOB = null;
-        try {
-            pwd_keystoreJOB = arch_confJOB.getParam(KEYSTOREPASS);
-            log.info("Clave JOB: " +pwd_keystoreJOB);
-        } catch (IOException ex) {
-            log.error("Error IO", ex);
-        }
+    pwd_keystoreJOB = arch_confJOB.getParam(KEYSTOREPASS);
+    log.info("Clave JOB: " +pwd_keystoreJOB);
       
     Path ruta_keystoreREPO = null;
-        try {
-            ruta_keystoreREPO = arch_confREPO.getPath(arch_confREPO.getParam(KESTOREPATH));
-            log.info("Path Keystore REPO: " + ruta_keystoreREPO.toString());
-        } catch (IOException ex) {
-            log.error("Error IO",ex);
-        }
+    ruta_keystoreREPO = arch_confREPO.getPath(arch_confREPO.getParam(KESTOREPATH));
+    log.info("Path Keystore REPO: " + ruta_keystoreREPO.toString());
         
       String pwd_keystoreREPO = null;
-        try {
-            pwd_keystoreREPO = arch_confREPO.getParam(KEYSTOREPASS);
-            log.info("Clave REPO: " +pwd_keystoreREPO);
-        } catch (IOException ex) {
-            log.error("Error IO", ex);
-        }
+      pwd_keystoreREPO = arch_confREPO.getParam(KEYSTOREPASS);
+      log.info("Clave REPO: " +pwd_keystoreREPO);
         
       Path ruta_TrustStore = null;
-        try {
-            ruta_TrustStore = arch_confREPO.getPath(arch_confREPO.getParam(TRUSTSTOREPATH));
-            log.info("Path TrustStore : " + ruta_TrustStore.toString());
-        } catch (IOException ex) {
-            log.error("Error IO",ex);
-        }
+      ruta_TrustStore = arch_confREPO.getPath(arch_confREPO.getParam(TRUSTSTOREPATH));
+      log.info("Path TrustStore : " + ruta_TrustStore.toString());
         
       String pwd_TrustStore = null;
-        try {
-            pwd_TrustStore = arch_confREPO.getParam(TRUSTSTOREPASS);
-            log.info("Clave REPO: " +pwd_TrustStore);
-        } catch (IOException ex) {
-            log.error("Error IO", ex);
-        }
+      pwd_TrustStore = arch_confREPO.getParam(TRUSTSTOREPASS);
+      log.info("Clave REPO: " +pwd_TrustStore);
       /* Abrir keystore*/
       Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
       certJOB.mostrarAlias();

@@ -20,11 +20,15 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import sun.security.x509.AlgorithmId;
@@ -112,6 +116,7 @@ public final class Certificado {
         }
             if (aliases.hasMoreElements()){
             result = (String)aliases.nextElement();
+            log.info("Nombre alias: " +result);
             }
             return result;
    
@@ -225,7 +230,7 @@ public final class Certificado {
             ks.store(keyStoreOutputStream, ksPass);
             log.info("Guardado nuevo Certificado en Keystore [OK] ");
         } catch (KeyStoreException ex) {
-            log.error("Error con el Keystrore",ex);
+            log.error("Error con el KeyStore",ex);
         } catch (FileNotFoundException ex) {
             log.error("Error no se encuetra el archivo",ex);
         } catch (IOException ex) {
@@ -353,5 +358,44 @@ public final class Certificado {
         out.close();
     
     }
-      
+
+    public Certificate abrirX509(String path){
+        Certificate cert = null;
+        FileInputStream fcert = null;
+        try {
+            fcert = new FileInputStream(path);
+            log.info("ruta certificado a abrir: "+path);
+        } catch (FileNotFoundException ex) {
+            log.error("No se puede abrir el archivo", ex);
+        }
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X.509");
+           // log.info("Certificado: "+cf.toString());
+        } catch (CertificateException ex) {
+            log.error("Error Certificado", ex);
+        }
+        Collection c = null;
+        try {
+            c = cf.generateCertificates(fcert);
+            Iterator i = c.iterator();
+            log.info("Cantidad de certificado: "+c.size());
+            if (i.hasNext()){
+               cert = (Certificate)i.next();
+            }
+        } catch (CertificateException ex) {
+            log.error("Error en certificado", ex);
+        }
+        return cert;
+    }
+
+    void borrarCert(String nomAliasJOB) {
+        try {
+            ks.deleteEntry(nomAliasJOB);
+        } catch (KeyStoreException ex) {
+            log.error("Error KeyStore", ex);
+        }
+    }
+   
+    
 }//end certificado

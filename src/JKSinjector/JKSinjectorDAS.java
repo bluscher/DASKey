@@ -5,10 +5,17 @@
  */
 package JKSinjector;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
-import java.security.KeyStoreException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Scanner;
+
+
 
 /**
  *
@@ -85,9 +92,15 @@ public class JKSinjectorDAS {
       Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
       certJOB.mostrarAlias();
       nomAliasJOB = certJOB.getNom1Alias();
-      System.out.println(nomAliasJOB);
+      Certificate cert = certJOB.abrirX509("C://test/output/certificate.crt");
+      //log.info("certificado: "+cert.toString());
+      certJOB.borrarCert(nomAliasJOB);
+      certJOB.setKeystore(nomAliasJOB, (X509Certificate) cert);
+      
+    
+    
       //certJOB.getDatosCertificado(nomAliasJOB);
-      Certificado test = new Certificado(); //creo keystore nuevo con certificado autofirmado
+      //Certificado test = new Certificado(); //creo keystore nuevo con certificado autofirmado
       
       
       

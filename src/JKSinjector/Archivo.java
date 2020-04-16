@@ -16,6 +16,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Scanner;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 
@@ -62,15 +63,24 @@ public class Archivo {
     
     
     //obtendo el parametro que corresponde a la variable String del archivo de config.
-    public String getParam(String var) throws FileNotFoundException, IOException{
-            FileReader fr = new FileReader(this.file);
+    public String getParam(String var){
+            FileReader fr = null;
+        try {
+            fr = new FileReader(this.file);
+        } catch (FileNotFoundException ex) {
+            log.error("No se enuecntra el archivo: ", ex);
+        }
             BufferedReader br = new BufferedReader(fr);           
             boolean flagFind = false;
             String resul = null;
             String linea = null;
             //int i= 0;
             while (flagFind==false){
-               linea = br.readLine();
+                try {
+                    linea = br.readLine();
+                } catch (IOException ex) {
+                    log.error("Error de IO: ", ex);
+                }
                if(linea.contains("=")){
                  String [] arrOdStr = linea.split("=");
                  if(arrOdStr[0] == null ? var == null : arrOdStr[0].equals(var)){
@@ -79,7 +89,11 @@ public class Archivo {
                  }
                }
             } //while     
+        try {
             fr.close();
+        } catch (IOException ex) {
+            log.error("Error IO: ", ex);
+        }
             return resul;
     }
     

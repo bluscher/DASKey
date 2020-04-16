@@ -57,12 +57,13 @@ public final class Certificado {
     
     private static final Logger log = Logger.getLogger(Certificado.class.getName());
     
-    final String password ;
-    final String archivo ;
+    private String password;
+    private String archivo;
     private KeyStore ks;
     private InputStream ksData;
     private char[] ksPass;
     private File Keystorefile; 
+    
     
     public Certificado(String pwd, String arch){
     //constructor
@@ -82,6 +83,10 @@ public final class Certificado {
         return this.ks;
     }
     
+    public Certificado(){
+      cargarKeystoreNEW();
+    }
+            
     public void mostrarAlias(){
      System.out.println("#Listar Alias " + this.archivo + ": [BEGIN]");
      Enumeration aliases = null ;
@@ -187,6 +192,32 @@ public final class Certificado {
         }
     }
     
+    public void cargarKeystoreNEW() {
+        try {
+            this.ks = KeyStore.getInstance("JKS");
+            this.ksPass = "test".toCharArray();
+            FileOutputStream newkeystore = new FileOutputStream("c://test/output/TestNewKeyStore.jks");
+            try {
+                ks.load(null,ksPass);
+                ks.setCertificateEntry("Test_certDesde0",this.getCertAutofirmados("CN= EXPERIAN_Java,O=Experian,OU=Experian,L=CABA,ST=CABA,C=AR"));
+                log.info("keystore [CREADO]");
+                ks.store(newkeystore, ksPass);
+            } catch (IOException ex) {
+                log.error("error el kestore no tiene certificado", ex);
+            } catch (NoSuchAlgorithmException ex) {
+                log.error("error Algoritmo", ex);
+            } catch (CertificateException ex) {
+                log.error("error certificado", ex);
+            }
+            newkeystore.close();
+        } //cargarKeystore
+        catch (KeyStoreException ex) {
+            log.error("error keystore", ex);
+        } catch (IOException ex) {
+           log.error("error IO", ex);
+        }
+    }
+    
     public void setKeystore(String Alias, X509Certificate clientCertificate){
         try {
             ks.setCertificateEntry(Alias, clientCertificate);
@@ -206,7 +237,13 @@ public final class Certificado {
         }
     }
     
-    
+    public void getDatosCertificado(String alias){    
+        try {
+            System.out.println( this.ks.getCertificate(alias).toString());
+        } catch (KeyStoreException ex) {
+            log.error("Error certificado", ex);
+        }
+    }
     
     /** 
      * Create a self-signed X.509 Certificate
@@ -268,7 +305,7 @@ public final class Certificado {
         return cert;
     }
     
-    public void saveCertAutofirmados(String subject){
+    public void saveCertAutofirmados(String cuerpo){
         KeyPairGenerator keyGen = null;
         try {
             keyGen = KeyPairGenerator.getInstance("RSA");
@@ -282,7 +319,7 @@ public final class Certificado {
         
         X509Certificate cert = null;
         try {
-            cert = crearX509(subject, kPair, KEY_LEN, ALGORITHM);
+            cert = crearX509(cuerpo, kPair, KEY_LEN, ALGORITHM);
             log.info("creacion certificado X509 [OK]");
         } catch (GeneralSecurityException | IOException ex) {
             log.error("error gral. ", ex);
@@ -310,6 +347,7 @@ public final class Certificado {
            String alias = (String) aliases.nextElement();
            pkcs12.setCertificateEntry(alias,ks.getCertificate(alias));
         }
+        //###MODIFICAR LA UBICACION FINAL DONDE SE GUARDA EL CERTIFICADO###
         FileOutputStream out = new FileOutputStream("C:/test/"+nameCert+".p12");
         pkcs12.store(out, ksPass);
         out.close();

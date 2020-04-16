@@ -7,6 +7,7 @@ package JKSinjector;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.KeyStoreException;
 import java.util.Scanner;
 
 /**
@@ -85,6 +86,10 @@ public class JKSinjectorDAS {
       certJOB.mostrarAlias();
       nomAliasJOB = certJOB.getNom1Alias();
       System.out.println(nomAliasJOB);
+      //certJOB.getDatosCertificado(nomAliasJOB);
+      Certificado test = new Certificado(); //creo keystore nuevo con certificado autofirmado
+      
+      
       
       /*
       Certificado certREPO = new Certificado(pwd_keystoreREPO, ruta_keystoreREPO.toString());

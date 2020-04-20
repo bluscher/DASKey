@@ -5,15 +5,17 @@
  */
 package JKSinjector;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -37,21 +39,34 @@ public class JKSinjectorDAS {
     public static void main(String[] args){
       String nomAliasJOB = "";
       String nomAliasREPO = "";
+      String pathCA = "";
+      Archivo arch_confJOB = null;
+      Archivo arch_confREPO = null;
+      
       //---Manipulacion archivos config del DAS
-      Archivo arch_confJOB = new Archivo("C:/test/DAS/Job Server v1.15/conf/com.eda.crypto.cfg");
-      Archivo arch_confREPO = new Archivo("C:/test/DAS/Repository Server v1.15/conf/com.eda.crypto.cfg");
- 
+      Carpeta root = new Carpeta();
+      String rutaConfigJob = root.getServiceConfig("Job Server");
+      log.info("Path configuracion JOB Service: " + rutaConfigJob);
+      String rutaConfigRepo = root.getServiceConfig("Repository Server");
+      log.info("Path configuracion REPO Service: " + rutaConfigRepo);
+   
+      arch_confJOB = new Archivo(rutaConfigJob);       
+      //Archivo arch_confJOB = new Archivo("C:/test/DAS/Job Server v1.15/conf/com.eda.crypto.cfg"); testlocal
+      arch_confREPO = new Archivo(rutaConfigRepo);
+      //Archivo arch_confREPO = new Archivo("C:/test/DAS/Repository Server v1.15/conf/com.eda.crypto.cfg");
       
-    Path ruta_keystoreJOB = null;
-    ruta_keystoreJOB = arch_confJOB.getPath(arch_confJOB.getParam(KESTOREPATH));
-    log.info("Path Keystore JOB: " + ruta_keystoreJOB.toString());
-    String pwd_keystoreJOB = null;
-    pwd_keystoreJOB = arch_confJOB.getParam(KEYSTOREPASS);
-    log.info("Clave JOB: " +pwd_keystoreJOB);
+    //---Recuperacion rutas y claves de los KeyStores, TrustStore 
+      Path ruta_keystoreJOB = null;
+      ruta_keystoreJOB = arch_confJOB.getPath(arch_confJOB.getParam(KESTOREPATH));
+      log.info("Path Keystore JOB: " + ruta_keystoreJOB.toString());
       
-    Path ruta_keystoreREPO = null;
-    ruta_keystoreREPO = arch_confREPO.getPath(arch_confREPO.getParam(KESTOREPATH));
-    log.info("Path Keystore REPO: " + ruta_keystoreREPO.toString());
+      String pwd_keystoreJOB = null;
+      pwd_keystoreJOB = arch_confJOB.getParam(KEYSTOREPASS);
+      log.info("Clave JOB: " +pwd_keystoreJOB);
+      
+      Path ruta_keystoreREPO = null;
+      ruta_keystoreREPO = arch_confREPO.getPath(arch_confREPO.getParam(KESTOREPATH));
+      log.info("Path Keystore REPO: " + ruta_keystoreREPO.toString());
         
       String pwd_keystoreREPO = null;
       pwd_keystoreREPO = arch_confREPO.getParam(KEYSTOREPASS);
@@ -64,31 +79,56 @@ public class JKSinjectorDAS {
       String pwd_TrustStore = null;
       pwd_TrustStore = arch_confREPO.getParam(TRUSTSTOREPASS);
       log.info("Clave REPO: " +pwd_TrustStore);
-      /* Abrir keystore*/
-      Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
-      certJOB.mostrarAlias();
-      nomAliasJOB = certJOB.getNom1Alias();
-      Certificate cert = certJOB.abrirX509("C://test/output/certificate.crt");
-      //log.info("certificado: "+cert.toString());
-      certJOB.borrarCert(nomAliasJOB);
-      certJOB.setKeystore(nomAliasJOB, (X509Certificate) cert);
       
-    
+      //---Obtengo ruta de le certificado aportado por el cliente
+      Carpeta input = new Carpeta();
+      File ca = input.getCertFile();
+        if (ca != null) {
+            pathCA = ca.getAbsolutePath();
+        }
+      
+      //---Abrir KeyStore
+      //1) JOBSERVER
+      Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
+      certJOB.mostrarAliases();
+      nomAliasJOB = certJOB.getNom1Alias();
+      Certificate certJ = certJOB.abrirX509(pathCA);
+      //log.info("certificado: "+certJ.toString()); muestra la signature del certificado
+      certJOB.borrarCert(nomAliasJOB);
+      certJOB.setKeystore(nomAliasJOB, (X509Certificate) certJ);
+      //2) REPOSITORYSERVER
+      Certificado certREPO = new Certificado(pwd_keystoreREPO, ruta_keystoreREPO.toString());
+      certREPO.mostrarAliases();
+      nomAliasREPO = certREPO.getNom1Alias();
+      Certificate certR = certREPO.abrirX509(pathCA);      
+      //log.info("certificado: "+certR.toString()); muestra la signature del certificado
+      certREPO.borrarCert(nomAliasREPO);
+      certREPO.setKeystore(nomAliasREPO, (X509Certificate) certR);
     
       //certJOB.getDatosCertificado(nomAliasJOB);
       //Certificado test = new Certificado(); //creo keystore nuevo con certificado autofirmado
       
-      
-      
-      /*
-      Certificado certREPO = new Certificado(pwd_keystoreREPO, ruta_keystoreREPO.toString());
-      nomAliasREPO = certREPO.getNom1Alias();
-      System.out.println(nomAliasJOB);
-      //certREPO.mostrarAlias();
-      //TrustStore
+   
+   
+      //---TrustStore
       Certificado truststore = new Certificado(pwd_TrustStore, ruta_TrustStore.toString());
-     // truststore.mostrarAlias();
-     */
+      truststore.mostrarAliases();
+        if (truststore.existeAlias(nomAliasJOB)) {
+          try {
+              truststore.borrarAlias(nomAliasJOB);
+          } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
+              log.error("Error con el KeyStore", ex);
+          }
+            truststore.setKeystore(nomAliasJOB, (X509Certificate)certJ);
+        }
+        if (truststore.existeAlias(nomAliasREPO)) {
+          try {
+              truststore.borrarAlias(nomAliasREPO);
+          } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
+              log.error("Error con el KeyStore", ex);
+          }
+            truststore.setKeystore(nomAliasREPO, (X509Certificate)certJ);
+        }
       
       
       /*
@@ -97,10 +137,8 @@ public class JKSinjectorDAS {
       //System.out.println(sistemaFicheros.toString());
       //configuracion para terminal de windwos
       //Path rutaFichero = sistemaFicheros.getPath("./Certificado");
-      
       //#prueba interna en carpeta de proyecto
       Path rutaFichero = sistemaFicheros.getPath("./src/Certificado");
-      
       //Carpeta c = new Carpeta(rutaFichero);
       //c.listarArchivos();
       //c.convertirCertificado();

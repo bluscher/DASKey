@@ -91,7 +91,7 @@ public final class Certificado {
       cargarKeystoreNEW();
     }
             
-    public void mostrarAlias(){
+    public void mostrarAliases(){
      System.out.println("#Listar Alias " + this.archivo + ": [BEGIN]");
      Enumeration aliases = null ;
         try {
@@ -228,7 +228,7 @@ public final class Certificado {
             ks.setCertificateEntry(Alias, clientCertificate);
             FileOutputStream keyStoreOutputStream = new FileOutputStream(archivo);
             ks.store(keyStoreOutputStream, ksPass);
-            log.info("Guardado nuevo Certificado en Keystore [OK] ");
+            log.info("Guardado nuevo Certificado en Keystore: " + archivo +" [OK] ");
         } catch (KeyStoreException ex) {
             log.error("Error con el KeyStore",ex);
         } catch (FileNotFoundException ex) {
@@ -310,7 +310,7 @@ public final class Certificado {
         return cert;
     }
     
-    public void saveCertAutofirmados(String cuerpo){
+    public void saveCertAutoSign(String cuerpo){
         KeyPairGenerator keyGen = null;
         try {
             keyGen = KeyPairGenerator.getInstance("RSA");
@@ -397,5 +397,13 @@ public final class Certificado {
         }
     }
    
+    public boolean existeAlias(String alias){
+        try {
+            return ks.containsAlias(alias);
+        } catch (KeyStoreException ex) {
+            log.error("No existe el Alias en el Keystore", ex);
+        }
+        return false; 
+    }
     
 }//end certificado

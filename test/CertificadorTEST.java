@@ -26,11 +26,11 @@ public class CertificadorTEST {
      
         
      Certificado cr = new Certificado(PASSWORD,ARCHIVO);
-     cr.mostrarAlias();
+     cr.mostrarAliases();
     // cr.borrarAlias("larbshwzpxf2");
     
      System.out.println("---------------------------------");
-     cr.mostrarAlias();
+     cr.mostrarAliases();
      //cr.generarCertAutoFirma();
      
     }//main

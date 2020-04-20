@@ -28,14 +28,21 @@ public class Archivo {
    
     private String ruta;
     private File file;
+    private Object cadenaVacia = (Object)"";
     
     static  Logger log = Logger.getLogger(Archivo.class.getName());
     
     public Archivo(String ruta) {
         this.ruta = ruta;
         try {
-            this.file = new File(ruta);
+            if (ruta.equals(cadenaVacia)) {
+                System.err.println("No existe la ruta al archivo");
+                System.exit(0);
+            } else {
+               this.file = new File(ruta); 
+            }
         } catch (Exception e) {
+            log.error("No se puede abrir el archivo de la ruta: " + ruta, e);
         }
     }
     

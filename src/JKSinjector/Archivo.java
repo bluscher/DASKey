@@ -16,7 +16,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Scanner;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 
@@ -118,7 +117,7 @@ public class Archivo {
                  String [] arrOdStr = linea.split("=");
                  if(arrOdStr[0] == null ? var == null : arrOdStr[0].equals(var)){
                    String [] finalPath = arrOdStr[1].split("}");
-                   resul = "/sis"+finalPath[1];
+                   resul = File.separator+"sis"+finalPath[1];
                    flagFind = true;
                  }
                }

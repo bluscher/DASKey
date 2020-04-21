@@ -57,7 +57,7 @@ public final class Certificado {
     private static final int EXPIRATION = 365;
     //Algoritmo de firma a usar
     private static final String ALGORITHM = "SHA1withRSA";
-    private static final String OUTPUT_PATH = "C://test/output/certificado.crt";
+    private static final String OUTPUT_PATH = System.getProperty("user.dir") + File.separator + "output"+ File.separator + "certificado.crt";
     
     private static final Logger log = Logger.getLogger(Certificado.class.getName());
     
@@ -201,7 +201,7 @@ public final class Certificado {
         try {
             this.ks = KeyStore.getInstance("JKS");
             this.ksPass = "test".toCharArray();
-            FileOutputStream newkeystore = new FileOutputStream("c://test/output/TestNewKeyStore.jks");
+            FileOutputStream newkeystore = new FileOutputStream(OUTPUT_PATH);
             try {
                 ks.load(null,ksPass);
                 ks.setCertificateEntry("Test_certDesde0",this.getCertAutofirmados("CN= EXPERIAN_Java,O=Experian,OU=Experian,L=CABA,ST=CABA,C=AR"));
@@ -353,7 +353,7 @@ public final class Certificado {
            pkcs12.setCertificateEntry(alias,ks.getCertificate(alias));
         }
         //###MODIFICAR LA UBICACION FINAL DONDE SE GUARDA EL CERTIFICADO###
-        FileOutputStream out = new FileOutputStream("C:/test/"+nameCert+".p12");
+        FileOutputStream out = new FileOutputStream(System.getProperty("user.dir") + File.separator + "output"+ File.separator +nameCert+".p12");
         pkcs12.store(out, ksPass);
         out.close();
     

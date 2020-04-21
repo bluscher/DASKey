@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.Iterator;
 import java.util.Scanner;
 import org.apache.log4j.Logger;
 
@@ -45,7 +44,7 @@ public class Carpeta {
     
     //Verifica si en la carpeta Input tiene un certificado y lo obtiene el primero.
     public File getCertFile(){
-        File carpeta = new File(rutaProyecto + "/Input/");
+        File carpeta = new File(rutaProyecto + File.separator +"Input"+File.separator);
         File[] listaf = carpeta.listFiles();
         
         if (carpeta.exists() && listaf.length <= 1) {
@@ -81,7 +80,7 @@ public class Carpeta {
             log.info("No se encontro el Archivo de configuracion");
             return "";
         }else
-        return rutaProyecto + "/"+ listarArchivos[0] + "/conf/com.eda.crypto.cfg";
+        return rutaProyecto + "/"+ listarArchivos[0] + File.separator + "conf" + File.separator + "com.eda.crypto.cfg";
     }
     
     

@@ -5,6 +5,8 @@
  */
 package JKSinjector;
 
+import DasKey.Certificado;
+
 
 /**
  *

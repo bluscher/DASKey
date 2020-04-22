@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package JKSinjector;
+package DasKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 
@@ -25,14 +23,14 @@ import java.util.logging.Logger;
  */
 
 
-public class JKSinjectorDAS {
+public class DASKey {
     
     static final String KESTOREPATH = "javax.net.ssl.keyStore";
     static final String KEYSTOREPASS = "javax.net.ssl.keyStorePassword";
     static final String TRUSTSTOREPATH = "javax.net.ssl.trustStore";
     static final String TRUSTSTOREPASS = "javax.net.ssl.trustStorePassword";
     
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(JKSinjectorDAS.class.getName());
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DASKey.class.getName());
     /**
      * @param args the command line arguments
      */
@@ -130,22 +128,7 @@ public class JKSinjectorDAS {
             truststore.setKeystore(nomAliasREPO, (X509Certificate)certJ);
         }
       
-      
-      /*
-      //---Utilizacion del certificado desde la carpeta de proyecto
-      FileSystem sistemaFicheros = FileSystems.getDefault();
-      //System.out.println(sistemaFicheros.toString());
-      //configuracion para terminal de windwos
-      //Path rutaFichero = sistemaFicheros.getPath("./Certificado");
-      //#prueba interna en carpeta de proyecto
-      Path rutaFichero = sistemaFicheros.getPath("./src/Certificado");
-      //Carpeta c = new Carpeta(rutaFichero);
-      //c.listarArchivos();
-      //c.convertirCertificado();
-      */
-      
-      
-      //pressAnyKeyToContinue();
+      pressAnyKeyToContinue();
       
        
 }//end main

@@ -23,14 +23,14 @@ import java.util.Scanner;
  */
 
 
-public class DASKey {
+public class Principal {
     
     static final String KESTOREPATH = "javax.net.ssl.keyStore";
     static final String KEYSTOREPASS = "javax.net.ssl.keyStorePassword";
     static final String TRUSTSTOREPATH = "javax.net.ssl.trustStore";
     static final String TRUSTSTOREPASS = "javax.net.ssl.trustStorePassword";
     
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DASKey.class.getName());
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Principal.class.getName());
     /**
      * @param args the command line arguments
      */
@@ -53,7 +53,10 @@ public class DASKey {
       arch_confREPO = new Archivo(rutaConfigRepo);
       //Archivo arch_confREPO = new Archivo("C:/test/DAS/Repository Server v1.15/conf/com.eda.crypto.cfg");
       
-    //---Recuperacion rutas y claves de los KeyStores, TrustStore 
+    //--------------------------------------------------------------//
+    //   Recuperacion rutas y claves de los KeyStores, TrustStore   //
+    //--------------------------------------------------------------//
+    //#JOB
       Path ruta_keystoreJOB = null;
       ruta_keystoreJOB = arch_confJOB.getPath(arch_confJOB.getParam(KESTOREPATH));
       log.info("Path Keystore JOB: " + ruta_keystoreJOB.toString());
@@ -61,7 +64,7 @@ public class DASKey {
       String pwd_keystoreJOB = null;
       pwd_keystoreJOB = arch_confJOB.getParam(KEYSTOREPASS);
       log.info("Clave JOB: " +pwd_keystoreJOB);
-      
+    //#REPOSITORY  
       Path ruta_keystoreREPO = null;
       ruta_keystoreREPO = arch_confREPO.getPath(arch_confREPO.getParam(KESTOREPATH));
       log.info("Path Keystore REPO: " + ruta_keystoreREPO.toString());
@@ -69,7 +72,8 @@ public class DASKey {
       String pwd_keystoreREPO = null;
       pwd_keystoreREPO = arch_confREPO.getParam(KEYSTOREPASS);
       log.info("Clave REPO: " +pwd_keystoreREPO);
-        
+      
+     //#TRUSTSTORE
       Path ruta_TrustStore = null;
       ruta_TrustStore = arch_confREPO.getPath(arch_confREPO.getParam(TRUSTSTOREPATH));
       log.info("Path TrustStore : " + ruta_TrustStore.toString());

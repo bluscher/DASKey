@@ -18,12 +18,14 @@ import org.apache.log4j.Logger;
  *
  * @author e10934a
  */
+
 public class Carpeta {
     private static final Logger log = Logger.getLogger(Carpeta.class.getName());
     //static final String pwd_keystore = "Miclave.1";
-    private String rutaProyecto;
+    private String rutaDAS;
     private Path path;
-
+    private static final String NOMAPP = File.separator +"DASKey";
+    private static final String PATHSYSTEM = System.getProperty("user.dir");
   
     public Carpeta(Path ruta){
         this.path = ruta;
@@ -33,23 +35,24 @@ public class Carpeta {
         }
         else
            {
-            this.rutaProyecto = ruta.toString();
-            // System.out.println(rutaProyecto);
+            this.rutaDAS = ruta.toString();
+            // System.out.println(rutaDAS);
            }
     }
     
     public Carpeta(){
-        rutaProyecto = System.getProperty("user.dir");
+        rutaDAS = PATHSYSTEM.replaceAll(NOMAPP,"");
     }
     
     //Verifica si en la carpeta Input tiene un certificado y lo obtiene el primero.
     public File getCertFile(){
-        File carpeta = new File(rutaProyecto + File.separator +"Input"+File.separator);
+        File carpeta = new File(PATHSYSTEM + File.separator +"input"+File.separator);
         File[] listaf = carpeta.listFiles();
         
         if (carpeta.exists() && listaf.length <= 1) {
             File aux = listaf[0];
-            log.info("ruta archivo y nombre: "+aux.getPath() + " | " + aux.getName());
+            log.info("Ruta archivo Certificado a agregar: "+aux.getPath());
+            log.info("Nombre Certificado: " + aux.getName());
             return aux;
         }else
             log.info("No hay certificado en la carpeta.");
@@ -73,14 +76,15 @@ public class Carpeta {
     }
     
     public String getServiceConfig(String nom){
-        rutaProyecto = "c://test/DAS"; // ####para pruebas local###
-        File f = new File(rutaProyecto);
+        //rutaProyecto = "c://test/DAS"; // ####para pruebas local###
+        File f = new File(rutaDAS);
+        log.debug("#######ruta DAS: "+rutaDAS);
         String[] listarArchivos = f.list(new FiltroContenido(nom));
         if (listarArchivos.length == 0) {
             log.info("No se encontro el Archivo de configuracion");
             return "";
         }else
-        return rutaProyecto + "/"+ listarArchivos[0] + File.separator + "conf" + File.separator + "com.eda.crypto.cfg";
+        return rutaDAS + "/"+ listarArchivos[0] + File.separator + "conf" + File.separator + "com.eda.crypto.cfg";
     }
     
     

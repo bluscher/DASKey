@@ -97,7 +97,7 @@ public final class Certificado {
         try {
             aliases = ks.aliases();
         } catch (KeyStoreException ex) {
-            log.error("Error no hay Alias en el Keystore",ex);
+            log.error("Error conn el Keystore: ",ex);
         }
       while (aliases.hasMoreElements()){
          System.out.println(aliases.nextElement());
@@ -182,7 +182,7 @@ public final class Certificado {
             try {
                 ks.load(ksData,ksPass);
             } catch (IOException ex) {
-                log.error("error el kestore no tiene certificado", ex);
+                log.error("Error con el KeyStore: ", ex);
             } catch (NoSuchAlgorithmException ex) {
                 log.error("error Algoritmo", ex);
             } catch (CertificateException ex) {

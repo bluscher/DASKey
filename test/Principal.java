@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DasKey;
 
+
+import DasKey.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.KeyStoreException;
@@ -15,8 +14,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
 import java.util.Scanner;
+
+
 
 /**
  *
@@ -30,6 +30,7 @@ public class Principal {
     static final String KEYSTOREPASS = "javax.net.ssl.keyStorePassword";
     static final String TRUSTSTOREPATH = "javax.net.ssl.trustStore";
     static final String TRUSTSTOREPASS = "javax.net.ssl.trustStorePassword";
+    
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Principal.class.getName());
     /**
      * @param args the command line arguments
@@ -48,10 +49,10 @@ public class Principal {
       String rutaConfigRepo = root.getServiceConfig("Repository Server");
       log.info("Path configuracion REPO Service: " + rutaConfigRepo);
    
-      arch_confJOB = new Archivo(rutaConfigJob);       
-     // arch_confJOB = new Archivo("C:/test/DAS/Job Server v1.15/conf/com.eda.crypto.cfg"); /*testlocal*/
-      arch_confREPO = new Archivo(rutaConfigRepo);
-     // arch_confREPO = new Archivo("C:/test/DAS/Repository Server v1.15/conf/com.eda.crypto.cfg"); /*testlocal*/
+      //arch_confJOB = new Archivo(rutaConfigJob);       
+      arch_confJOB = new Archivo("C:/test/DAS/Job Server v1.15/conf/com.eda.crypto.cfg"); /*testlocal*/
+      //arch_confREPO = new Archivo(rutaConfigRepo);
+      arch_confREPO = new Archivo("C:/test/DAS/Repository Server v1.15/conf/com.eda.crypto.cfg");
       
     //--------------------------------------------------------------//
     //   Recuperacion rutas y claves de los KeyStores, TrustStore   //
@@ -64,8 +65,6 @@ public class Principal {
       String pwd_keystoreJOB = null;
       pwd_keystoreJOB = arch_confJOB.getParam(KEYSTOREPASS);
       log.info("Clave JOB: " +pwd_keystoreJOB);
-      estaEncriptado(pwd_keystoreJOB);
-      
     //#REPOSITORY  
       Path ruta_keystoreREPO = null;
       ruta_keystoreREPO = arch_confREPO.getPath(arch_confREPO.getParam(KESTOREPATH));
@@ -74,7 +73,6 @@ public class Principal {
       String pwd_keystoreREPO = null;
       pwd_keystoreREPO = arch_confREPO.getParam(KEYSTOREPASS);
       log.info("Clave REPO: " +pwd_keystoreREPO);
-      estaEncriptado(pwd_keystoreREPO);
       
      //#TRUSTSTORE
       Path ruta_TrustStore = null;
@@ -84,7 +82,6 @@ public class Principal {
       String pwd_TrustStore = null;
       pwd_TrustStore = arch_confREPO.getParam(TRUSTSTOREPASS);
       log.info("Clave REPO: " +pwd_TrustStore);
-      estaEncriptado(pwd_TrustStore);
       
       //---Obtengo ruta de le certificado aportado por el cliente
       Carpeta input = new Carpeta();
@@ -93,8 +90,6 @@ public class Principal {
             pathCA = ca.getAbsolutePath();
         }
       
-  
-        
       //---Abrir KeyStore
       //1) JOBSERVER
       Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
@@ -102,7 +97,7 @@ public class Principal {
       nomAliasJOB = certJOB.getNom1Alias();
       Certificate certJ = certJOB.abrirX509(pathCA);
       //log.info("certificado: "+certJ.toString()); muestra la signature del certificado
-      certJOB.borrarCert(nomAliasJOB);
+ //     certJOB.borrarCert(nomAliasJOB);
       certJOB.setKeystore(nomAliasJOB, (X509Certificate) certJ);
       //2) REPOSITORYSERVER
       Certificado certREPO = new Certificado(pwd_keystoreREPO, ruta_keystoreREPO.toString());
@@ -110,7 +105,7 @@ public class Principal {
       nomAliasREPO = certREPO.getNom1Alias();
       Certificate certR = certREPO.abrirX509(pathCA);      
       //log.info("certificado: "+certR.toString()); muestra la signature del certificado
-      certREPO.borrarCert(nomAliasREPO);
+ //     certREPO.borrarCert(nomAliasREPO);
       certREPO.setKeystore(nomAliasREPO, (X509Certificate) certR);
     
       //certJOB.getDatosCertificado(nomAliasJOB);
@@ -156,13 +151,4 @@ public class Principal {
          catch(Exception e)
           {}  
      }  
-    
-    static public void estaEncriptado(String clave){
-        if (clave.contains("ENC(")) {
-            log.info("La clave: " + clave + " esta encriptada, no se puede seguir con el proceso");
-            System.exit(0);
-        }
-    }
-    
-  
 }

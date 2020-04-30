@@ -6,16 +6,12 @@
 package DasKey;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
 import java.util.Scanner;
 
 /**
@@ -86,57 +82,58 @@ public class Principal {
       log.info("Clave REPO: " +pwd_TrustStore);
       estaEncriptado(pwd_TrustStore);
       
+      //-----------------------------//  
+      //      keystore con CA        //
+      //-----------------------------// 
+      
       //---Obtengo ruta de le certificado aportado por el cliente
       Carpeta input = new Carpeta();
       File ca = input.getCertFile();
         if (ca != null) {
             pathCA = ca.getAbsolutePath();
         }
-      
-  
+        
+      String pwdCA = "Miclave.1";
+      StrongBox caStore = new StrongBox(pwdCA, pathCA.toString());
+      //-----------------------------// 
         
       //---Abrir KeyStore
       //1) JOBSERVER
-      Certificado certJOB = new Certificado(pwd_keystoreJOB, ruta_keystoreJOB.toString());
-      certJOB.mostrarAliases();
-      nomAliasJOB = certJOB.getNom1Alias();
-      Certificate certJ = certJOB.abrirX509(pathCA);
-      //log.info("certificado: "+certJ.toString()); muestra la signature del certificado
-      certJOB.borrarCert(nomAliasJOB);
-      certJOB.setKeystore(nomAliasJOB, (X509Certificate) certJ);
-      //2) REPOSITORYSERVER
-      Certificado certREPO = new Certificado(pwd_keystoreREPO, ruta_keystoreREPO.toString());
-      certREPO.mostrarAliases();
-      nomAliasREPO = certREPO.getNom1Alias();
-      Certificate certR = certREPO.abrirX509(pathCA);      
-      //log.info("certificado: "+certR.toString()); muestra la signature del certificado
-      certREPO.borrarCert(nomAliasREPO);
-      certREPO.setKeystore(nomAliasREPO, (X509Certificate) certR);
-    
-      //certJOB.getDatosCertificado(nomAliasJOB);
-      //Certificado test = new Certificado(); //creo keystore nuevo con certificado autofirmado
+      log.info("#Modificando Job JKS...");
+      StrongBox ksJOB = new StrongBox(pwd_keystoreJOB, ruta_keystoreJOB.toString());
+      ksJOB.mostrarAliases();
+      nomAliasJOB = ksJOB.getNomFirstAlias();
+      //Certificate extCertJob = ksJOB.abrirX509(pathCA); #abrir certificado
+      ksJOB.borrarCert(nomAliasJOB);
+      ksJOB.setKey(caStore.getKey(caStore.getNomFirstAlias(), pwdCA), nomAliasJOB, pwd_keystoreJOB);
+      //ksJOB.setKeystore(nomAliasJOB, (X509Certificate) extCertJob); #borrar
       
-   
+      //2) REPOSITORYSERVER
+      log.info("#Modificando Repo JKS...");
+      StrongBox ksREPO = new StrongBox(pwd_keystoreREPO, ruta_keystoreREPO.toString());
+      ksREPO.mostrarAliases();
+      nomAliasREPO = ksREPO.getNomFirstAlias();
+      //Certificate extCertRepo = ksREPO.abrirX509(pathCA); #abrir certificado
+      ksREPO.borrarCert(nomAliasREPO);
+      ksREPO.setKey(caStore.getKey(caStore.getNomFirstAlias(), pwdCA), nomAliasREPO, pwd_keystoreREPO);
+      //ksREPO.setKeystore(nomAliasREPO, (X509Certificate) extCertRepo);#borrar
+    
    
       //---TrustStore
-      Certificado truststore = new Certificado(pwd_TrustStore, ruta_TrustStore.toString());
+      log.info("#Modificando TrustStore...");
+      StrongBox truststore = new StrongBox(pwd_TrustStore, ruta_TrustStore.toString());
       truststore.mostrarAliases();
         if (truststore.existeAlias(nomAliasJOB)) {
-          try {
-              truststore.borrarAlias(nomAliasJOB);
-          } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
-              log.error("Error con el KeyStore", ex);
-          }
-            truststore.setKeystore(nomAliasJOB, (X509Certificate)certJ);
-        }
+            truststore.borrarAlias(nomAliasJOB); 
+        }  
         if (truststore.existeAlias(nomAliasREPO)) {
-          try {
-              truststore.borrarAlias(nomAliasREPO);
-          } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
-              log.error("Error con el KeyStore", ex);
-          }
-            truststore.setKeystore(nomAliasREPO, (X509Certificate)certJ);
+            truststore.borrarAlias(nomAliasREPO);
         }
+ 
+      //Certificate cerTrusted = caStore.getTurstStoreCert(caStore.getNomFirstAlias(), pwdCA);
+      truststore.setKeystore(nomAliasREPO, (X509Certificate) caStore.getTurstStoreCert(caStore.getNomFirstAlias(), pwdCA));    
+      log.info("Importe TrustStore [OK]");
+      log.info(truststore.getNomFirstAlias());
       
       pressAnyKeyToContinue();
       

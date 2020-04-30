@@ -5,7 +5,7 @@
  */
 package JKSinjector;
 
-import DasKey.Certificado;
+import DasKey.StrongBox;
 
 
 /**
@@ -27,7 +27,7 @@ public class CertificadorTEST {
     
      
         
-     Certificado cr = new Certificado(PASSWORD,ARCHIVO);
+     StrongBox cr = new StrongBox(PASSWORD,ARCHIVO);
      cr.mostrarAliases();
     // cr.borrarAlias("larbshwzpxf2");
     

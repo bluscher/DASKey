@@ -20,6 +20,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -49,7 +51,7 @@ import sun.security.x509.X500Name;*/
  *
  * @author e10934a
  */
-public final class Certificado {
+public final class StrongBox {
   
      //Medida de las claves
     public static final int KEY_LEN = 2048;
@@ -59,7 +61,7 @@ public final class Certificado {
     private static final String ALGORITHM = "SHA1withRSA";
     private static final String OUTPUT_PATH = System.getProperty("user.dir") + File.separator + "output"+ File.separator + "certificado.crt";
     
-    private static final Logger log = Logger.getLogger(Certificado.class.getName());
+    private static final Logger log = Logger.getLogger(StrongBox.class.getName());
     
     private String password;
     private String archivo;
@@ -69,14 +71,14 @@ public final class Certificado {
     private File Keystorefile; 
     
     
-    public Certificado(String pwd, String arch){
+    public StrongBox(String pwd, String arch){
     //constructor
         password = pwd;
         archivo = arch;
         //  Keystorefile = new File(arch); borrar
         cargarKeystore();
     }
-     public Certificado(String pwd, File f){
+     public StrongBox(String pwd, File f){
     //constructor
         password = pwd;
         archivo = "";
@@ -87,7 +89,7 @@ public final class Certificado {
         return this.ks;
     }
     
-    public Certificado(){
+    public StrongBox(){
       cargarKeystoreNEW();
     }
             
@@ -105,7 +107,7 @@ public final class Certificado {
      System.out.println("#Listar Alias: [END]");
     } 
     
-    public String getNom1Alias(){
+    public String getNomFirstAlias(){
         String result = "Ningun Alias";
         Enumeration aliases = null;
         try {
@@ -131,15 +133,19 @@ public final class Certificado {
         return 0;
     }
     
-    public void borrarAlias(String aliasToDell) throws KeyStoreException, FileNotFoundException, IOException, NoSuchAlgorithmException, CertificateException{
-        if(ks.containsAlias(aliasToDell)){
-         FileOutputStream resul = new FileOutputStream(this.archivo);
-         ks.deleteEntry(aliasToDell);
-         ks.store(resul, ksPass);
-         resul.close();
-         log.info("[Borrado exitoso] "+aliasToDell);
-     }else
-      log.info("No hubo Borrado:" + aliasToDell);
+    public void borrarAlias(String aliasToDell){
+        try {
+            if(ks.containsAlias(aliasToDell)){
+                try (FileOutputStream resul = new FileOutputStream(this.archivo)) {
+                    ks.deleteEntry(aliasToDell);
+                    ks.store(resul, ksPass);
+                }
+                log.info("[Borrado exitoso] "+aliasToDell);
+            }else
+                log.info("No hubo Borrado:" + aliasToDell);
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException ex) {
+           log.error(ex);
+        }
     } 
     
     public KeyStore cargarKeystore(String pwd, File pathKS){
@@ -204,7 +210,7 @@ public final class Certificado {
             FileOutputStream newkeystore = new FileOutputStream(OUTPUT_PATH);
             try {
                 ks.load(null,ksPass);
-                ks.setCertificateEntry("Test_certDesde0",this.getCertAutofirmados("CN= EXPERIAN_Java,O=Experian,OU=Experian,L=CABA,ST=CABA,C=AR"));
+                ks.setCertificateEntry("Test_certDesde0",this.newCertAutofirmados("CN= EXPERIAN_Java,O=Experian,OU=Experian,L=CABA,ST=CABA,C=AR"));
                 log.info("keystore [CREADO]");
                 ks.store(newkeystore, ksPass);
             } catch (IOException ex) {
@@ -241,6 +247,68 @@ public final class Certificado {
             log.error("Error con el Certificado",ex);
         }
     }
+    /*
+     public void setKeystore2(String Alias, Certificate clientCertificate){
+        try {
+          
+            Certificate[] vectorCert = new Certificate[1];
+            vectorCert[0]=clientCertificate;
+            ks.setKeyEntry(Alias, clientCertificate.getPublicKey(), ksPass, vectorCert);
+            FileOutputStream keyStoreOutputStream = new FileOutputStream(archivo);
+            ks.store(keyStoreOutputStream, ksPass);
+            log.info("Guardado nuevo Certificado en Keystore: " + archivo +" [OK] ");
+        } catch (KeyStoreException ex) {
+            log.error("Error con el KeyStore",ex);
+        } catch (FileNotFoundException ex) {
+            log.error("Error no se encuetra el archivo",ex);
+        } catch (IOException ex) {
+            log.error("Error de IO",ex);
+        } catch (NoSuchAlgorithmException ex) {
+            log.error("Error con el Algoritmo",ex);
+        } catch (CertificateException ex) {
+            log.error("Error con el Certificado",ex);
+        }
+    }*/
+    public KeyStore.Entry getKey(String alias, String password){
+        char[] keyPassowrd = password.toCharArray();
+        KeyStore.ProtectionParameter claveEntrada = new KeyStore.PasswordProtection(keyPassowrd);
+        try {
+            KeyStore.Entry keyEntry = ks.getEntry(alias, claveEntrada);
+            log.info("Recuperar entrada Keystore alias : "+alias+" [OK]");
+            return keyEntry;
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException ex) {
+            log.error(ex);
+        }
+        return null;
+    }
+    
+    public Certificate getTurstStoreCert (String alias, String password){
+        char[] keyPassowrd = password.toCharArray();
+        KeyStore.ProtectionParameter claveEntrada = new KeyStore.PasswordProtection(keyPassowrd);
+        try {
+            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(alias, claveEntrada);
+            return privateKeyEntry.getCertificate();
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException ex) {
+            log.error(ex);
+        }
+        return null;
+    }
+    
+    public void setKey(KeyStore.Entry keyEntry,String alias, String password){
+        char[] keyPassowrd = password.toCharArray();
+        KeyStore.ProtectionParameter claveEntrada = new KeyStore.PasswordProtection(keyPassowrd);
+        try {
+            FileOutputStream newkeystore = new FileOutputStream(archivo);
+            ks.setEntry(alias, keyEntry, claveEntrada);
+            log.info("Cargar clave del alias :"+alias +" [OK]");
+            ks.store(newkeystore, keyPassowrd);
+        } catch (KeyStoreException ex) {
+            log.error(ex);
+        } catch (IOException | NoSuchAlgorithmException | CertificateException ex) {
+            log.error(ex);
+        }
+    
+    }
     
     public void getDatosCertificado(String alias){    
         try {
@@ -251,7 +319,7 @@ public final class Certificado {
     }
     
     /** 
-     * Create a self-signed X.509 Certificate
+     * Create a self-signed X.509 Certificate ##metodo 1 de prueb##
      * @param dn the X.509 Distinguished Name, eg "CN=EXPERIAN_Java, L=CABA, C=AR"
      * @param pair the KeyPair
      * @param days how many days from now the Certificate is valid for
@@ -287,7 +355,7 @@ public final class Certificado {
       return cert;
     } //end X509
     
-    public X509Certificate getCertAutofirmados(String subject){
+    public X509Certificate newCertAutofirmados(String subject){
         KeyPairGenerator keyGen = null;
         try {
             keyGen = KeyPairGenerator.getInstance("RSA");
@@ -371,24 +439,48 @@ public final class Certificado {
         CertificateFactory cf = null;
         try {
             cf = CertificateFactory.getInstance("X.509");
-           // log.info("Certificado: "+cf.toString());
+           // log.info("StrongBox: "+cf.toString());
         } catch (CertificateException ex) {
             log.error("Error Certificado", ex);
         }
-        Collection c = null;
+        
         try {
-            c = cf.generateCertificates(fcert);
-            Iterator i = c.iterator();
-            log.info("Cantidad de certificado: "+c.size());
-            if (i.hasNext()){
-               cert = (Certificate)i.next();
-            }
+            cert = cf.generateCertificate(fcert);
+            log.info("certificago cargado [OK]");
+          
         } catch (CertificateException ex) {
             log.error("Error en certificado", ex);
         }
         return cert;
     }
 
+    public CertPath getCertPathX509(String path){
+        CertPath cert = null;
+        FileInputStream fcert = null;
+        try {
+            fcert = new FileInputStream(path);
+            log.info("ruta certificado a abrir: "+path);
+        } catch (FileNotFoundException ex) {
+            log.error("No se puede abrir el archivo", ex);
+        }
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X.509");
+           // log.info("StrongBox: "+cf.toString());
+        } catch (CertificateException ex) {
+            log.error("Error Certificado", ex);
+        }
+        
+        try {
+            cert = cf.generateCertPath(fcert);
+            log.info("certificago cargado [OK]");
+          
+        } catch (CertificateException ex) {
+            log.error("Error en certificado", ex);
+        }
+        return cert;
+    }
+    
     void borrarCert(String nomAliasJOB) {
         try {
             ks.deleteEntry(nomAliasJOB);
@@ -404,6 +496,15 @@ public final class Certificado {
             log.error("No existe el Alias en el Keystore", ex);
         }
         return false; 
+    }
+    
+    public Certificate getCertificado(String alias){
+        try {
+            return ks.getCertificate(alias);
+        } catch (KeyStoreException ex) {
+            log.error(ex);
+        }
+        return null;
     }
     
 }//end certificado

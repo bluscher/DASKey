@@ -1,0 +1,6 @@
+//--------------------------------//
+//            MEJORAS             //
+//--------------------------------//
+- Considerar claves encriptadas ENC(xxxxx)
+
+- Generar Certificado Autofirmado.¿? No se si es necesario experian provee con instalacion

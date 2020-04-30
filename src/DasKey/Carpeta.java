@@ -90,7 +90,7 @@ public class Carpeta {
     
     /*#viejo#*/
     public void convertirCertificado() throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException{
-        //Certificado ca = new Certificado(pwd_keystore, p.toString()+this.getNombreFile());  
+        //Certificado ca = new StrongBox(pwd_keystore, p.toString()+this.getNombreFile());  
         File f = this.path.toFile();
         String[] listaArchivos = f.list(new FiltroExtension(".jks"));
         System.out.println("Archivo: "+listaArchivos[0]);
@@ -100,7 +100,7 @@ public class Carpeta {
         String nameExt = listaArchivos[0];
         //quitar todos los caracteres incluido el punto y lo que sigue
         String nameCorto = nameExt.split("\\.",2)[0];
-        Certificado ca = new Certificado(pwd_keystore,f.getAbsolutePath()+"/"+listaArchivos[0]);
+        StrongBox ca = new StrongBox(pwd_keystore,f.getAbsolutePath()+"/"+listaArchivos[0]);
         ca.toPKCS12(nameCorto); 
         log.info(" Conversion [Exitosa]");
         

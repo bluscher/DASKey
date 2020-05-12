@@ -91,10 +91,18 @@ public class Principal {
       File ca = input.getCertFile();
         if (ca != null) {
             pathCA = ca.getAbsolutePath();
+        }else{
+            log.info("No hay ningun archivo .jks en la carpeta /input.");
+            System.exit(0);
         }
-        
-      String pwdCA = "Miclave.1";
-      StrongBox caStore = new StrongBox(pwdCA, pathCA.toString());
+      
+      System.out.println ("Por favor introduzca la clave del archivo: "+ca.toString());
+      System.out.print("Password: ");
+      String pwdCA = "";
+      Scanner entradaEscaner = new Scanner (System.in); //Creación de un objeto Scanner
+      pwdCA = entradaEscaner.nextLine ();
+      //String pwdCA = "Miclave.1";
+      StrongBox caStore = new StrongBox(pwdCA, pathCA);
       //-----------------------------// 
         
       //---Abrir KeyStore

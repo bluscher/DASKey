@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 
 public class Carpeta {
     private static final Logger log = Logger.getLogger(Carpeta.class.getName());
-    //static final String pwd_keystore = "Miclave.1";
     private String rutaDAS;
     private Path path;
     private static final String NOMAPP = File.separator +"DASKey";

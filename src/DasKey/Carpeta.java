@@ -48,7 +48,7 @@ public class Carpeta {
         File carpeta = new File(PATHSYSTEM + File.separator +"input"+File.separator);
         File[] listaf = carpeta.listFiles();
         
-        if (carpeta.exists() && listaf.length <= 1) {
+        if (carpeta.exists() && listaf.length >= 1) {
             File aux = listaf[0];
             log.info("Ruta archivo Certificado a agregar: "+aux.getPath());
             log.info("Nombre Certificado: " + aux.getName());
